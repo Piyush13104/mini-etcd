@@ -183,6 +183,7 @@ func main() {
 
 	peers, all := parsePeers(*peerSpec, *id)
 
+	// add the existing logs in memory
 	rlog, err := raft.OpenLog(filepath.Join(*dataDir, "wal.log"))
 	if err != nil {
 		log.Fatalf("open log: %v", err)
@@ -191,11 +192,7 @@ func main() {
 
 	st := store.New()
 
-	// The apply callback IS the state machine boundary.
-	//
-	// Nothing else in the program is allowed to call st.Apply. Every
-	// mutation on every node arrives here, in log order, only after it is
-	// committed. That is what keeps three independent processes identical.
+	// parse all peers
 	applyFn := func(index int64, data []byte) any {
 		cmd, err := store.DecodeCommand(data)
 		if err != nil {

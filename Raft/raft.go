@@ -96,6 +96,7 @@ type Node struct {
 }
 
 func NewNode(id string, isLeader bool, peers []Peer, lg *Log, apply ApplyFunc) *Node {
+
 	n := &Node{
 		ID: id, IsLeader: isLeader, Peers: peers,
 		log: lg, apply: apply,
@@ -122,7 +123,7 @@ func (n *Node) Start() {
 	go n.applyLoop()
 	if n.IsLeader {
 		for _, p := range n.Peers {
-			go n.replicateLoop(p) // one goroutine per follower
+			go n.replicateLoop(p)
 		}
 	}
 }

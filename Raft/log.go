@@ -34,14 +34,14 @@ type Log struct {
 
 // OpenLog loads an existing log file into memory, or creates a new one.
 func OpenLog(path string) (*Log, error) {
-	// O_RDWR because we both read it at startup and truncate it later.
-	// O_APPEND guarantees every write lands at the end even if some other
+
 	// code seeks the file -- the OS enforces it, we can't get it wrong.
 	f, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0o644)
 	if err != nil {
 		return nil, err
 	}
 
+	// file
 	l := &Log{file: f}
 
 	// Read the whole file, remembering where each entry starts.
@@ -78,10 +78,11 @@ func OpenLog(path string) (*Log, error) {
 	return l, nil
 }
 
+// last Index of Logs
 func (l *Log) LastIndex() int64 {
 	l.mu.RLock()
 	defer l.mu.RUnlock()
-	return int64(len(l.entries)) // entries are contiguous from 1
+	return int64(len(l.entries))
 }
 
 // TermAt reports the term of entry `index`, and whether it exists.
