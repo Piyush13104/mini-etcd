@@ -1,0 +1,52 @@
+name: mini-etcd
+
+networks:
+  etcd-net:
+    driver: bridge  
+volumes:
+  node1-data:
+  node2-data:
+  node3-data:
+
+services:
+  node1:
+    build: .
+    container_name: node1
+    hostname: node1
+    command:
+      - --id=1
+      - --http-addr=:8080
+      - --data-dir=/data
+      - --peers=1@node1:8080,2@node2:8080,3@node3:8080
+      - --leader-id=1
+    ports: ["8080:8080"]    
+    volumes: ["node1-data:/data"]
+    networks: [etcd-net]
+
+  node2:
+    build: .
+    container_name: node2
+    hostname: node2
+    command:
+      - --id=2
+      - --http-addr=:8080
+      - --data-dir=/data
+      - --peers=1@node1:8080,2@node2:8080,3@node3:8080
+      - --leader-id=1
+    ports: ["8081:8080"]   
+    volumes: ["node2-data:/data"]
+    networks: [etcd-net]
+
+  node3:
+    build: .
+    container_name: node3
+    hostname: node3
+    command:
+      - --id=3
+      - --http-addr=:8080
+      - --data-dir=/data
+      - --peers=1@node1:8080,2@node2:8080,3@node3:8080
+      - --leader-id=1
+    ports: ["8082:8080"]
+    volumes: ["node3-data:/data"]
+    networks: [etcd-net]
